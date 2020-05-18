@@ -78,13 +78,12 @@ def LRU(size, pages):
     print("number of faults: " + str(page_faults))
 
 
-# LRU implementation
+# Optimal implementation
 def OPT(size, pages):
     page_faults = 0
 
     # create array of random page numbers between 0:9
     page_numbers = allocator(pages)
-    #print('The page string: ', page_numbers)
 
     # 2D array to store page:age values. Acts as memory
     memory_dict = []
