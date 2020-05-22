@@ -17,9 +17,10 @@ def FIFO(size, pages):
     memory_dict = []
 
     # insert initial page into memory with age of 0.
-    memory_dict.append([page_numbers[0], 0])
-    page_faults += 1
-    page_numbers = page_numbers[1:]
+    if len(page_numbers) > 0:
+        memory_dict.append([page_numbers[0], 0])
+        page_faults += 1
+        page_numbers = page_numbers[1:]
 
     # insert rest of pages into memory
     for i in range(0, len(page_numbers)):
@@ -52,9 +53,10 @@ def LRU(size, pages):
     memory_dict = []
 
     # insert initial page into memory with age of 0.
-    memory_dict.append([page_numbers[0], 0])
-    page_faults += 1
-    page_numbers = page_numbers[1:]
+    if len(page_numbers) > 0:
+        memory_dict.append([page_numbers[0], 0])
+        page_faults += 1
+        page_numbers = page_numbers[1:]
 
     # insert rest of pages into memory
     for i in range(0, len(page_numbers)):
@@ -70,7 +72,7 @@ def LRU(size, pages):
             memory_dict = grow_age(memory_dict)
             memory_dict[check(page, memory_dict)] = [page, 0]
         else:
-            # replace the oldest page in memory
+            # replace the least recently used page in memory
             page_faults += 1
             memory_dict = grow_age(memory_dict)
             memory_dict[oldest(memory_dict)] = [page, 0]
@@ -89,14 +91,14 @@ def OPT(size, pages):
     memory_dict = []
 
     # insert initial page into memory with age of 0.
-    memory_dict.append([page_numbers[0], 0])
-    page_faults += 1
-    page_numbers = page_numbers[1:]
+    if len(page_numbers) > 0:
+        memory_dict.append([page_numbers[0], 0])
+        page_faults += 1
+        page_numbers = page_numbers[1:]
 
     # insert rest of pages into memory
     for i in range(0, len(page_numbers)):
         page = page_numbers[i]
-        #print('Now inserting: ', page)
         # insert into new frame only if frame size not full
         if len(memory_dict) < size and check(page, memory_dict) == -1:
             page_faults += 1
@@ -106,11 +108,10 @@ def OPT(size, pages):
             # means it's a hit.
             memory_dict = grow_age(memory_dict)
         else:
-            # replace page that won't be used the most in the future.
+            # replace page that won't be used the most in the future, or the closest page using indices.
             page_faults += 1
             memory_dict = grow_age(memory_dict)
-            memory_dict[future(i+1, page_numbers, memory_dict)] = [page, 0]
-            #print('page went into third')
+            memory_dict[future(i + 1, page_numbers, memory_dict)] = [page, 0]
         print(memory_dict)
     print("number of faults: " + str(page_faults))
 
@@ -120,32 +121,20 @@ def future(start_index, page_numbers, memory_dict):
     # putting all in-memory pages into an array for comparison
     pages = []
     ages = []
-    max_age = -1
-    page_index = -1
     for pairs in memory_dict:
         pages.append(pairs[0])
         ages.append(pairs[1])
     pages_copy = pages.copy()
-    #print('**************** future session ********************')
-    #print('Start index of base array is ', start_index)
     # determining which in-memory page is least used in the future
     for i in range(start_index, len(page_numbers)):
         future_page = page_numbers[i]
-        #print('Candidate page is ', future_page, 'with index ', i, ' in the base array ', page_numbers)
         if future_page in pages:
             pages.pop(pages.index(future_page))
-            #print('Just removed ', future_page, ' as a candidate.')
         if len(pages) == 1:
-            #print('Only page left in list is ', pages[0], 'with index of ', pages_copy.index(pages[0]), 'in copy ', pages_copy)
+            # this is the page that gets used the latest in the future
             return pages_copy.index(pages[0])
-    #print('Remaining pages ', pages)
-    for page in pages:
-        if ages[pages_copy.index(page)] > max_age:
-            max_age = ages[pages_copy.index(page)]
-            page_index = pages_copy.index(page)
-            #print('max_age currently is: ', max_age, ' and belongs to ', page, 'at index ', page_index)
-    #print('Last resort, oldest page index is: ', page_index)
-    return page_index
+    return pages_copy.index(pages[0])
+
 
 # returns index of oldest page in memory
 def oldest(memory_dict):
@@ -181,18 +170,13 @@ def allocator(pages):
     while i < pages:
         page_string.append(int(random.random() * 10))
         i += 1
-    #print(page_string)
-    #return page_string
-    #return [2, 3, 4, 2, 1, 3, 7, 5]
-    #return [7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2]
-    #return [4, 7, 6, 1, 7, 6, 1, 2, 7, 2]
-    return [1, 2, 3, 4, 2, 1, 5, 6, 2, 1, 2, 3, 7, 6, 3, 2, 1, 2, 3, 6]
+    return page_string
 
 
 def main():
-    FIFO(4, 5)
-    LRU(4, 5)
-    OPT(4, 5)
+    FIFO(3, 32)
+    LRU(3, 32)
+    OPT(3, 32)
 
 
 if __name__ == '__main__':
