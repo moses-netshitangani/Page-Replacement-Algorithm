@@ -9,9 +9,11 @@ import sys
 
 # FIFO implementation
 def FIFO(size, page_sequence_fifo):
+    print(' FIFO '.center(80, "*"))
+
     page_faults = 0
 
-    # 2D array to store page:age values. Acts as memory
+    # 2D array to store page:age values. Acts as main memory
     memory_dict = []
 
     # insert rest of pages into memory
@@ -30,12 +32,13 @@ def FIFO(size, page_sequence_fifo):
             page_faults += 1
             memory_dict = grow_age(memory_dict)
             memory_dict[oldest(memory_dict)] = [page, 0]
-        print(memory_dict)
+    show_memory(memory_dict)
     return page_faults
 
 
 # LRU implementation
 def LRU(size, page_sequence_lru):
+    print(' LRU '.center(80, "*"))
     page_faults = 0
 
     # 2D array to store page:age values. Acts as memory
@@ -59,12 +62,14 @@ def LRU(size, page_sequence_lru):
             page_faults += 1
             memory_dict = grow_age(memory_dict)
             memory_dict[oldest(memory_dict)] = [page, 0]
-        print(memory_dict)
+    show_memory(memory_dict)
     return page_faults
 
 
 # Optimal implementation
 def OPT(size, page_sequence_opt):
+    print(' OPT '.center(80, "*"))
+
     page_faults = 0
 
     # 2D array to store page:age values. Acts as memory
@@ -86,7 +91,7 @@ def OPT(size, page_sequence_opt):
             page_faults += 1
             memory_dict = grow_age(memory_dict)
             memory_dict[future(i + 1, page_sequence_opt, memory_dict)] = [page, 0]
-        print(memory_dict)
+    show_memory(memory_dict)
     return page_faults
 
 
@@ -99,6 +104,7 @@ def future(start_index, page_numbers, memory_dict):
         pages.append(pairs[0])
         ages.append(pairs[1])
     pages_copy = pages.copy()
+
     # determining which in-memory page is least used in the future
     for i in range(start_index, len(page_numbers)):
         future_page = page_numbers[i]
@@ -108,6 +114,14 @@ def future(start_index, page_numbers, memory_dict):
             # this is the page that gets used the latest in the future
             return pages_copy.index(pages[0])
     return pages_copy.index(pages[0])
+
+
+# prints out pages in a formatted way
+def show_memory(memory_array):
+    print('Final state of memory: ', end=" ")
+    for i in range(0, len(memory_array)):
+        print(memory_array[i][0], end="     ")
+    print()
 
 
 # returns index of oldest page in memory
@@ -153,15 +167,17 @@ def main():
     # Sequence length has been provided
     if len(sys.argv) == 3:
         page_sequence = create_random_pages(sys.argv[2])
-        print('FIFO ', FIFO(eval(frame_size), page_sequence), 'page faults')
-        print('LRU ', LRU(eval(frame_size), page_sequence), 'page faults')
-        print('OPT ', OPT(eval(frame_size), page_sequence), 'page faults')
+        print('\nPage sequence to be used: ', page_sequence, '\n')
+        print('FIFO ', FIFO(eval(frame_size), page_sequence), 'page faults \n')
+        print('LRU ', LRU(eval(frame_size), page_sequence), 'page faults \n')
+        print('OPT ', OPT(eval(frame_size), page_sequence), 'page faults \n')
     else:
         # Sequence length has not been provided. Choose a random sequence between 10 and 50
         page_sequence = create_random_pages(random.randint(10, 50))
-        print('FIFO ', FIFO(eval(frame_size), page_sequence), 'page faults')
-        print('LRU ', LRU(eval(frame_size), page_sequence), 'page faults')
-        print('OPT ', OPT(eval(frame_size), page_sequence), 'page faults')
+        print('\nPage sequence to be used: ', page_sequence, '\n')
+        print('FIFO ', FIFO(eval(frame_size), page_sequence), 'page faults \n')
+        print('LRU ', LRU(eval(frame_size), page_sequence), 'page faults \n')
+        print('OPT ', OPT(eval(frame_size), page_sequence), 'page faults \n')
 
 
 if __name__ == '__main__':
