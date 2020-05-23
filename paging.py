@@ -4,27 +4,19 @@
 # Date: 16 May 2020
 
 import random
+import sys
 
 
 # FIFO implementation
-def FIFO(size, pages):
+def FIFO(size, page_sequence_fifo):
     page_faults = 0
-
-    # create array of random page numbers between 0:9
-    page_numbers = allocator(pages)
 
     # 2D array to store page:age values. Acts as memory
     memory_dict = []
 
-    # insert initial page into memory with age of 0.
-    if len(page_numbers) > 0:
-        memory_dict.append([page_numbers[0], 0])
-        page_faults += 1
-        page_numbers = page_numbers[1:]
-
     # insert rest of pages into memory
-    for i in range(0, len(page_numbers)):
-        page = page_numbers[i]
+    for i in range(0, len(page_sequence_fifo)):
+        page = page_sequence_fifo[i]
         # insert into new frame only if frame size not full
         if len(memory_dict) < size and check(page, memory_dict) == -1:
             page_faults += 1
@@ -39,28 +31,19 @@ def FIFO(size, pages):
             memory_dict = grow_age(memory_dict)
             memory_dict[oldest(memory_dict)] = [page, 0]
         print(memory_dict)
-    print("number of faults: " + str(page_faults))
+    return page_faults
 
 
 # LRU implementation
-def LRU(size, pages):
+def LRU(size, page_sequence_lru):
     page_faults = 0
-
-    # create array of random page numbers between 0:9
-    page_numbers = allocator(pages)
 
     # 2D array to store page:age values. Acts as memory
     memory_dict = []
 
-    # insert initial page into memory with age of 0.
-    if len(page_numbers) > 0:
-        memory_dict.append([page_numbers[0], 0])
-        page_faults += 1
-        page_numbers = page_numbers[1:]
-
     # insert rest of pages into memory
-    for i in range(0, len(page_numbers)):
-        page = page_numbers[i]
+    for i in range(0, len(page_sequence_lru)):
+        page = page_sequence_lru[i]
 
         # insert into new frame only if frame size not full
         if len(memory_dict) < size and check(page, memory_dict) == -1:
@@ -77,28 +60,19 @@ def LRU(size, pages):
             memory_dict = grow_age(memory_dict)
             memory_dict[oldest(memory_dict)] = [page, 0]
         print(memory_dict)
-    print("number of faults: " + str(page_faults))
+    return page_faults
 
 
 # Optimal implementation
-def OPT(size, pages):
+def OPT(size, page_sequence_opt):
     page_faults = 0
-
-    # create array of random page numbers between 0:9
-    page_numbers = allocator(pages)
 
     # 2D array to store page:age values. Acts as memory
     memory_dict = []
 
-    # insert initial page into memory with age of 0.
-    if len(page_numbers) > 0:
-        memory_dict.append([page_numbers[0], 0])
-        page_faults += 1
-        page_numbers = page_numbers[1:]
-
     # insert rest of pages into memory
-    for i in range(0, len(page_numbers)):
-        page = page_numbers[i]
+    for i in range(0, len(page_sequence_opt)):
+        page = page_sequence_opt[i]
         # insert into new frame only if frame size not full
         if len(memory_dict) < size and check(page, memory_dict) == -1:
             page_faults += 1
@@ -111,9 +85,9 @@ def OPT(size, pages):
             # replace page that won't be used the most in the future, or the closest page using indices.
             page_faults += 1
             memory_dict = grow_age(memory_dict)
-            memory_dict[future(i + 1, page_numbers, memory_dict)] = [page, 0]
+            memory_dict[future(i + 1, page_sequence_opt, memory_dict)] = [page, 0]
         print(memory_dict)
-    print("number of faults: " + str(page_faults))
+    return page_faults
 
 
 # returns index of page that is least used in the future
@@ -162,8 +136,8 @@ def grow_age(memory_dict):
     return memory_dict
 
 
-def allocator(pages):
-    # Creating array of random integers between 0-9
+def create_random_pages(pages):
+    # Creating array of random integers between 0-9 to
     pages = int(pages)
     page_string = []
     i = 0
@@ -174,10 +148,23 @@ def allocator(pages):
 
 
 def main():
-    FIFO(3, 32)
-    LRU(3, 32)
-    OPT(3, 32)
+    frame_size = sys.argv[1]
+
+    # Sequence length has been provided
+    if len(sys.argv) == 3:
+        page_sequence = create_random_pages(sys.argv[2])
+        print('FIFO ', FIFO(eval(frame_size), page_sequence), 'page faults')
+        print('LRU ', LRU(eval(frame_size), page_sequence), 'page faults')
+        print('OPT ', OPT(eval(frame_size), page_sequence), 'page faults')
+    else:
+        # Sequence length has not been provided. Choose a random sequence between 10 and 50
+        page_sequence = create_random_pages(random.randint(10, 50))
+        print('FIFO ', FIFO(eval(frame_size), page_sequence), 'page faults')
+        print('LRU ', LRU(eval(frame_size), page_sequence), 'page faults')
+        print('OPT ', OPT(eval(frame_size), page_sequence), 'page faults')
 
 
 if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print('Usage: py paging.py frame_size OR py paging.py frame_size sequence_length')
     main()
