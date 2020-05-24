@@ -150,6 +150,15 @@ def grow_age(memory_dict):
     return memory_dict
 
 
+# converts user-entered page_sequence into sequence of integers
+def process_pages(page_sequence):
+    sequence = page_sequence[1:len(page_sequence)-1].split(',')
+    pages = []
+    for page in sequence:
+        pages.append(eval(page))
+    return pages
+
+
 def create_random_pages(pages):
     # Creating array of random integers between 0-9 to
     pages = int(pages)
@@ -164,9 +173,16 @@ def create_random_pages(pages):
 def main():
     frame_size = sys.argv[1]
 
-    # Sequence length has been provided
-    if len(sys.argv) == 3:
+    if len(sys.argv) == 3 and sys.argv[2][0] != '[':
+        # Sequence length has been provided
         page_sequence = create_random_pages(sys.argv[2])
+        print('\nPage sequence to be used: ', page_sequence, '\n')
+        print('FIFO ', FIFO(eval(frame_size), page_sequence), 'page faults \n')
+        print('LRU ', LRU(eval(frame_size), page_sequence), 'page faults \n')
+        print('OPT ', OPT(eval(frame_size), page_sequence), 'page faults \n')
+    elif len(sys.argv) == 3 and sys.argv[2][0] == '[':
+        # Page sequence has been provided
+        page_sequence = process_pages(sys.argv[2])
         print('\nPage sequence to be used: ', page_sequence, '\n')
         print('FIFO ', FIFO(eval(frame_size), page_sequence), 'page faults \n')
         print('LRU ', LRU(eval(frame_size), page_sequence), 'page faults \n')
@@ -182,5 +198,7 @@ def main():
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print('Usage: py paging.py frame_size OR py paging.py frame_size sequence_length')
-    main()
+        print('Usage: py paging.py frame_size\nOR\npy paging.py frame_size sequence_length\nOR\npy paging.py '
+              'frame_size page_sequence(as a square-bracket enclosed comma-separated string e.g [7,5,8,4,6])')
+    else:
+        main()
