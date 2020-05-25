@@ -198,7 +198,8 @@ def main():
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print('Usage: py paging.py frame_size\nOR\npy paging.py frame_size sequence_length\nOR\npy paging.py '
-              'frame_size page_sequence(as a square-bracket enclosed comma-separated string e.g [7,5,8,4,6])')
+        print('Usage: python paging.py frame_size\nOR\npython paging.py frame_size sequence_length\nOR\npython '
+              'paging.py frame_size page_sequence(as a square-bracket enclosed comma-separated string e.g [7,5,8,4,'
+              '6])')
     else:
         main()
