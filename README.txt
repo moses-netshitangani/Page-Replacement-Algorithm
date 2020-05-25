@@ -29,3 +29,7 @@ uses a user-specified page sequence. The page_sequence parameter should
 be a square-bracket enclosed and comma-separated list.
 
 EXAMPLE:	python paging.py 4 [1,2,3,7,3,5]
+
+
+NB: When using ssh to test if the program ran, I found that it ran with python v3.
+So you would replace 'python paging.py' with 'python3 paging.py'. Thank you.
